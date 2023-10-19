@@ -1,140 +1,287 @@
-/*
------------CONSIGNA PRIMER PARCIAL----------------------------------
-	Crear un algoritmo que represente un contador binario, 
-    el primer led(que se encuentra a la izq) es el mas significativo
-    los valores van de 0 a 15.
-    
----------------------------------------------------------------------
-*/
-
-#define B3 12
-#define B2 11
-#define B1 10
-#define B0 9
-
-#define TIEMPO 1000
-
-void PrenderLed(int encenderLed);
-void EncenderBinario(int estado3, int estado2,int estado1,int estado0);
-void setup()
-{
-  pinMode(B3, OUTPUT);
-  pinMode(B2, OUTPUT);
-  pinMode(B1, OUTPUT);
-  pinMode(B0, OUTPUT);
+#define A 10
+#define B 11
+#define C 5
+#define D 6
+#define E 7
+#define F 9
+#define G 8
+#define SUBE 4
+#define BAJA 3
+#define RESET 2
+#define UNIDAD A4
+#define DECENA A5
+#define APAGADOS 0
+#define TIMEDISPLAYON 10
+#define SENSOR A0
+#define MOTOR 12
+#define FOTODIODO A1
   
-  Serial.begin(9600);
+
+int contador = 0;
+int sube = 1;
+int subePrevia = 1;
+int baja = 1;
+int bajaPrevia = 1;
+int reset = 1;
+int resetPrevia = 1;
+
+const float umbralTemperatura = 30.0;
+
+const int lecturatemperatura = 300;
+
+
+void setup()
+{ 
+  pinMode(10 , OUTPUT);
+  pinMode(11 , OUTPUT);
+  pinMode(5 , OUTPUT);
+  pinMode(6 , OUTPUT);
+  pinMode(7 , OUTPUT);
+  pinMode(9 , OUTPUT);
+  pinMode(8 , OUTPUT);
+  pinMode(UNIDAD , OUTPUT);
+  pinMode(DECENA , OUTPUT);
+  pinMode(13, OUTPUT);
+  pinMode(12, OUTPUT);
+  
+  pinMode(3, INPUT_PULLUP);
+  pinMode(4, INPUT_PULLUP);
+  pinMode(2, INPUT_PULLUP);
+  pinMode(SUBE, INPUT_PULLUP);
+  pinMode(BAJA, INPUT_PULLUP);
+  pinMode(RESET, INPUT_PULLUP);
+  
+  printDigit(0);
+  
   
 }
 
-int  contador=0;
 
 
 void loop()
-{  
-   
-  contador++;
-  if(contador>15)
+{
+    	
+  
+  int presiono = keypressed();
+  if(presiono == SUBE)
   {
-    contador=0;
+    contador ++;
+    if(contador>99)
+      contador = 0;
   }
-  PrenderLed(contador);
-  delay(TIEMPO);
+  else if (presiono == BAJA)
+  {
+    contador --;
+    if(contador < 0)
+      contador = 99;   
+  }
+  else if(presiono == RESET)
+  {
+    contador = 0;
+  }
+  
+  float lectura;
+  float temperatura;
+  lectura = analogRead(SENSOR);
+  temperatura = map(lectura, 20, 358, -5, 125);
+  Serial.println("Temperatura: " + String(temperatura) + "°C");
+  printCount(contador);
+  
+  if(temperatura> lecturatemperatura){
+     digitalWrite(2, HIGH);
+  }else{
+  	
+    digitalWrite(2, LOW);	
+  }
+  
+  int sensorFotodiodo = analogRead(SENSOR);
+  
+  if(sensorFotodiodo > umbralTemperatura){
+     digitalWrite(12, HIGH);
+  }else{
+  	
+    digitalWrite(12, LOW);	
+  }
 }
 
-//muestra el numero binario
-void PrenderLed(int encenderLed)
+
+void printDigit(int digit)
 {
-  Serial.println(encenderLed);
-  switch(encenderLed)
+  digitalWrite(A, LOW);
+  digitalWrite(B, LOW);
+  digitalWrite(C, LOW);
+  digitalWrite(D, LOW);
+  digitalWrite(E, LOW);
+  digitalWrite(F, LOW);
+  digitalWrite(G, LOW);
+  switch(digit)
   {
-    case 0: 
-    	EncenderBinario(LOW,LOW,LOW,LOW);
-  	  break;
-    
-    
-    //Dato 0001
-    case 1: 
-    	EncenderBinario(LOW,LOW,LOW,HIGH);
-  	  break;
- 
-    //Dato 0010
-    case 2: 
-    	EncenderBinario(LOW,LOW,HIGH,LOW);
- 	  break;
-  
-    //Dato 0011
-    case 3:   
-    	EncenderBinario(LOW,LOW,HIGH,HIGH);
-      break;
-  
-    //Dato 0100
+  	case 1:
+    {
+    	digitalWrite(B, HIGH);
+    	digitalWrite(C, HIGH);
+      	break;
+    }
+    case 2:
+    {	
+      	digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(D, HIGH);
+      	digitalWrite(E, HIGH);
+      	digitalWrite(G, HIGH);
+      	break;
+    }
+  	case 3:
+    {
+    	digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+      	digitalWrite(G, HIGH);
+      	break;
+    }
     case 4:
-    	EncenderBinario(LOW,HIGH,LOW,LOW);
-     break;
-    
-    //Dato 0101
- 	 case 5:   
-        EncenderBinario(LOW,HIGH,LOW,HIGH);
-  	  break;
-    
-  //Dato 0110
-      case 6:  
-    	EncenderBinario(LOW,HIGH,HIGH,LOW);
-      break;
-    
-  //Dato 0111  
-      case 7:  
-    	EncenderBinario(LOW,HIGH,HIGH,HIGH);
-      break;
-    
-  //Dato 1000
-       case 8:
-    	EncenderBinario(HIGH,LOW,LOW,LOW);
-      break;   
+    {
+      	digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+      	digitalWrite(F, HIGH);
+      	digitalWrite(G, HIGH);
+      	break;
+    }  	
+    case 5:
+    {
+    	digitalWrite(A, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+      	digitalWrite(F, HIGH);
+      	digitalWrite(G, HIGH);
+      	break;
+    }
+    case 6:
+    {
+    	digitalWrite(A, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+      	digitalWrite(E, HIGH);
+      	digitalWrite(F, HIGH);
+      	digitalWrite(G, HIGH);
+      	break;
+    }
+    case 7:
+    {
+    	digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+      	break;
+    }
+    case 8:
+    {
+    	digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+      	digitalWrite(E, HIGH);
+      	digitalWrite(F, HIGH);
+      	digitalWrite(G, HIGH);
+      	break;
+    }
+    case 9:
+    {
+    	digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+      	digitalWrite(F, HIGH);
+      	digitalWrite(G, HIGH);
+      	break;
+    }
+  	case 0:
+    {
+      	digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+      	digitalWrite(E, HIGH);
+      	digitalWrite(F, HIGH);
+    	break;
+    }
+  }//switch
+  	
   
-  //Dato 1001
-      case 9:   
-    	EncenderBinario(HIGH,LOW,LOW,HIGH);
-      break;
-    
-  //Dato 1010
-  	  case 10:  
-    	EncenderBinario(HIGH,LOW,HIGH,LOW);
-      break;
-    
-  //Dato 1011
-      case 11:
-    	EncenderBinario(HIGH,LOW,HIGH,HIGH);
-      break;
-    
-  //Dato 1100
-      case 12:  
-    	EncenderBinario(HIGH,HIGH,LOW,LOW);   
-      break;
-  //Dato 1101
-      case 13:
-    	EncenderBinario(HIGH,HIGH,LOW,HIGH);
-      break;
-  //Dato 1110
-      case 14:
-    	EncenderBinario(HIGH,HIGH,HIGH,LOW);
-      break;
-    
-  //Dato 1111
-  	  case 15:
-    	EncenderBinario(HIGH,HIGH,HIGH,HIGH);
-      break;
-    
-  }
   
 }
 
-//Enciende cada led dependiendo el estado que recibe
-void EncenderBinario(int estado3, int estado2,int estado1,int estado0)
+
+    
+int keypressed(void)
 {
-  digitalWrite(B3,estado3);
-  digitalWrite(B2,estado2);
-  digitalWrite(B1,estado1);
-  digitalWrite(B0,estado0);
+  
+  sube = digitalRead(SUBE);
+  baja = digitalRead(BAJA);
+  reset = digitalRead(RESET);
+  if(sube)
+    subePrevia = 1;
+  if(baja)
+    bajaPrevia = 1;
+  if(reset)
+    resetPrevia = 1;
+  
+  	if(sube == 0 && sube != subePrevia)
+    {
+      subePrevia = sube;
+      return SUBE;
+    }
+  
+  	if(baja == 0 && baja != bajaPrevia)
+    {
+    	bajaPrevia = baja;
+      return BAJA;
+    
+    }
+  
+  	if(reset == 0 && reset != resetPrevia)
+    {
+    	resetPrevia = reset;
+      	return RESET;
+    
+    }
+    
+return 0;
 }
+
+
+void prendeDigito(int digito)
+{
+  if(digito == UNIDAD)
+  {
+  	digitalWrite(UNIDAD, LOW);
+  	digitalWrite(DECENA, HIGH);
+    delay(TIMEDISPLAYON);
+  }
+  else if(digito == DECENA)
+  {
+  	digitalWrite(UNIDAD, HIGH);
+  	digitalWrite(DECENA, LOW);
+    delay(TIMEDISPLAYON);
+  
+  }
+  else
+  {
+  	digitalWrite(UNIDAD, HIGH);
+  	digitalWrite(DECENA, HIGH);
+  }
+
+}
+
+
+void printCount(int contador)
+{
+  prendeDigito(APAGADOS);
+  printDigit(contador/10);
+  prendeDigito(DECENA);
+  prendeDigito(APAGADOS);
+  printDigit(contador - 10*((int)contador /10));
+  prendeDigito(UNIDAD);
+
+}
+
